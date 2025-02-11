@@ -25,20 +25,20 @@ DOCKER_CMD ?= docker
 
 include $(CURDIR)/common.mk
 
-image:
+deps:
 	mkdir -p ${CURDIR}/dst
 	${DOCKER_CMD} build $(DOCKER_BINFMT_MISC) -t $(L4T_CUDA_REGISTRY):$(TAG) \
 		--build-arg "RELEASE=$(RELEASE)" --build-arg "CUDA=$(CUDA)" \
 		--build-arg "UBUNTU_DISTRIB=$(UBUNTU_DISTRIB)" \
 		-f ./Dockerfile.cuda ./
 	${DOCKER_CMD} run -t $(DOCKER_BINFMT_MISC) -v $(CURDIR)/dst:/dst $(L4T_CUDA_REGISTRY):$(TAG) sh -c 'cp -r /usr/local/cuda/* /dst'
+	${DOCKER_CMD} rm `${DOCKER_CMD} ps -a | grep $(L4T_CUDA_REGISTRY):$(TAG) | head -n1 | awk '{print $$1;}'`
+	${DOCKER_CMD} rmi  `${DOCKER_CMD} images | grep $(L4T_CUDA_REGISTRY)  | head -n1 | awk '{print $$3;}'`
+image:
 	${DOCKER_CMD} build $(DOCKER_BINFMT_MISC) -t $(L4T_BASE_REGISTRY):$(TAG) \
 		--build-arg "RELEASE=$(RELEASE)" --build-arg "CUDA=$(CUDA)" \
 		--build-arg "UBUNTU_DISTRIB=$(UBUNTU_DISTRIB)" \
-		-v $(CURDIR)/dst:/dst -f ./Dockerfile.$(UBUNTU_DISTRIB) ./
-	${DOCKER_CMD} rm `${DOCKER_CMD} ps -a | grep $(L4T_CUDA_REGISTRY):$(TAG) | head -n1 | awk '{print $$1;}'`
-	${DOCKER_CMD} rmi  `${DOCKER_CMD} images | grep $(L4T_CUDA_REGISTRY)  | head -n1 | awk '{print $$3;}'`
-
+		-f ./Dockerfile.$(UBUNTU_DISTRIB) ./
 push:
 	sudo ${DOCKER_CMD} save $(L4T_BASE_REGISTRY):$(TAG) | docker load
 	docker tag localhost/$(L4T_BASE_REGISTRY):$(TAG) $(L4T_BASE_REGISTRY):$(TAG)
