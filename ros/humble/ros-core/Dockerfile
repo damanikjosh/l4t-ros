@@ -14,7 +14,7 @@
 
 ARG RELEASE="r32.7"
 
-FROM l4t-base:jammy-$RELEASE
+FROM damanikjosh/l4t-base:jammy-$RELEASE
 
 # setup timezone
 RUN echo 'Etc/UTC' > /etc/timezone && \
