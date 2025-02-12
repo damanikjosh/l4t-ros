@@ -53,7 +53,7 @@ RUN apt-get update && \
     pciutils \
     python3 \
     python3-pexpect \
-    python3-distutils \
+    python3-setuptools \
     python3-numpy \
     sox \
     udev \
