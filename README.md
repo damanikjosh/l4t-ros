@@ -1,54 +1,55 @@
-# L4T ROS コンテナイメージ
+# L4T ROS Container Image
 
-L4T ROSコンテナイメージは、NVIDIA GPUに対応したROS（Robot Operating System）コンテナイメージです。Ubuntuイメージをベースに、NVIDIA Container Runtimeを用いてNVIDIA GPU対応を実現し、ROSディストリビューションを組み込んだコンテナイメージを提供します。
+This is the fork from [aptpod/l4t-ros](https://github.com/aptpod/l4t-ros) that extends to Ubuntu 24.04 and ROS2 Jazzy.
 
-## 必要条件
+The L4T ROS container image is a ROS (Robot Operating System) container image compatible with NVIDIA GPUs. It is based on an Ubuntu image and leverages the NVIDIA Container Runtime to enable NVIDIA GPU support while incorporating a ROS distribution.
 
-このイメージを作成するためには以下のツールが必要です。
+## Requirements
 
-- Docker
-- podman
+The following tools are required to create this image:
 
-## L4Tベースイメージ作成
+- Docker  
 
-1. 任意のバージョンのUbuntuイメージをベースにします。
-1. NVIDIA Container Runtimeに必要なツールをインストールします。
+## Creating the L4T Base Image
 
-以下のコマンドを実行してイメージを作成します。
+1. Use any version of the Ubuntu image as a base.  
+2. Install the necessary tools required for the NVIDIA Container Runtime.  
+
+Run the following commands to create the image:
 
 ```bash
-sudo make UBUNTU_DISTRIB=jammy L4T_BASE_REGISTRY=l4t-base L4T_CUDA_REGISTRY=l4t-cuda image
-make UBUNTU_DISTRIB=jammy L4T_BASE_REGISTRY=l4t-base push
+sudo make UBUNTU_DISTRIB=noble L4T_BASE_REGISTRY=l4t-base L4T_CUDA_REGISTRY=l4t-cuda image
+make UBUNTU_DISTRIB=noble L4T_BASE_REGISTRY=l4t-base push
 ```
 
-| 変数 | 値 |
-| ---- | ----- |
-| UBUNTU_DISTRIB | jammy, focal, bionic (default: jammy) |
+| Variable         | Values                           |
+|-----------------|--------------------------------|
+| UBUNTU_DISTRIB  | noble, jammy, focal, bionic (default: noble) |
 
-## L4T ROSコンテナイメージ作成
+## Creating the L4T ROS Container Image
 
-1. L4TベースイメージにROSディストリビューションをインストールします。
-1. NVIDIA GPUに対応したROSコンテナを作成します。
+1. Install the ROS distribution on the L4T base image.  
+2. Create a ROS container compatible with NVIDIA GPUs.  
 
-以下の手順で実行します：
-- 作成したいROSディストリビューションのディレクトリに移動します。
-- 次のコマンドを実行します。
+Follow these steps:
+- Navigate to the directory of the desired ROS distribution.  
+- Run the following command:
 
 ```bash
 make image
 ```
 
-| ROS Distro | Directory |
-| ---------- | --------- |
-| ROS2 Humble | ros/humble |
-| ROS2 Foxy | ros/foxy |
-| ROS Noetic | ros/noetic |
-| ROS Melodic | ros/melodic |
-
+| ROS Distro     | Directory      |
+|---------------|--------------|
+| ROS2 Jazzy    | ros/jazzy    |
+| ROS2 Humble   | ros/humble   |
+| ROS2 Foxy     | ros/foxy     |
+| ROS Noetic    | ros/noetic   |
+| ROS Melodic   | ros/melodic  |
 
 ## Usage
 
-コンテナを実行するためのコマンド例は以下の通りです。GPUとGUIオプションを含めることができます。
+The following command is an example of how to run the container, including GPU and GUI options:
 
 ```bash
 xhost +local:
@@ -59,19 +60,15 @@ docker run -it --rm \
     -e DISPLAY=$DISPLAY \
     -e QT_X11_NO_MITSHM=1 \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
-    reg.aptpod.io/intdash-robotics/l4t-ros/l4t-ros:humble-desktop-r32.7 \
+    damanikjosh/l4t-ros:jazzy-desktop-r32.7 \
     /bin/bash
 ```
 
-## 謝辞とライセンス
+## Acknowledgments and License
 
-このプロジェクトは、以下のリソースの内容をApache License 2.0に準拠して利用しています。
+This project utilizes content from the following resources in compliance with the Apache License 2.0:
 
-- NVIDIA L4T Base Container Images: [NVIDIA GitLab](https://gitlab.com/nvidia/container-images/l4t-base)
-- Open Source Robotics Foundation Docker Images: [GitHub Repository](https://github.com/osrf/docker_images)
+- **NVIDIA L4T Base Container Images**: [NVIDIA GitLab](https://gitlab.com/nvidia/container-images/l4t-base)  
+- **Open Source Robotics Foundation Docker Images**: [GitHub Repository](https://github.com/osrf/docker_images)  
 
-これらのリソースはApache License 2.0の下で提供されており、本プロジェクトでもそのライセンス条項に従っています。詳細については、各リソースのライセンスファイルを参照してください。
-
-
-
-
+These resources are provided under the Apache License 2.0, and this project follows the terms of that license. For more details, please refer to the license files of each resource.
