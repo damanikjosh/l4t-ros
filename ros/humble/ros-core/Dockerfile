@@ -1,20 +1,6 @@
-# Copyright 2015-2023 Open Source Robotics Foundation
-
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-ARG RELEASE="r32.7"
-
-FROM damanikjosh/l4t-base:jammy-$RELEASE
+# This is an auto generated Dockerfile for ros:ros-core
+# generated from docker_images_ros2/create_ros_core_image.Dockerfile.em
+FROM ubuntu:jammy
 
 # setup timezone
 RUN echo 'Etc/UTC' > /etc/timezone && \
@@ -25,21 +11,26 @@ RUN echo 'Etc/UTC' > /etc/timezone && \
 
 # install packages
 RUN apt-get update && apt-get install -q -y --no-install-recommends \
+    ca-certificates \
+    curl \
     dirmngr \
     gnupg2 \
     && rm -rf /var/lib/apt/lists/*
 
-# setup sources.list
-RUN echo "deb http://packages.ros.org/ros2/ubuntu jammy main" > /etc/apt/sources.list.d/ros2-latest.list
 
-# setup keys
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+# Setup ROS Apt sources
+RUN curl -L -s -o /tmp/ros2-apt-source.deb https://github.com/ros-infrastructure/ros-apt-source/releases/download/1.1.0/ros2-apt-source_1.1.0.jammy_all.deb \
+    && echo "1600cb8cc28258a39bffc1736a75bcbf52d1f2db371a4d020c1b187d2a5a083b /tmp/ros2-apt-source.deb" | sha256sum --strict --check \
+    && apt-get update \
+    && apt-get install /tmp/ros2-apt-source.deb \
+    && rm -f /tmp/ros2-apt-source.deb \
+    && rm -rf /var/lib/apt/lists/*
 
 # setup environment
-ENV LANG C.UTF-8
-ENV LC_ALL C.UTF-8
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
 
-ENV ROS_DISTRO humble
+ENV ROS_DISTRO=humble
 
 # install ros2 packages
 RUN apt-get update && apt-get install -y --no-install-recommends \

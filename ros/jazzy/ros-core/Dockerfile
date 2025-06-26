@@ -1,23 +1,9 @@
-# Copyright 2015-2023 Open Source Robotics Foundation
-
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-ARG RELEASE="r32.7"
-
-FROM damanikjosh/l4t-base:noble-$RELEASE
+# This is an auto generated Dockerfile for ros:ros-core
+# generated from docker_images_ros2/create_ros_core_image.Dockerfile.em
+FROM ubuntu:noble
 
 # setup timezone
 RUN echo 'Etc/UTC' > /etc/timezone && \
-    rm /etc/localtime && \
     ln -s /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
     apt-get update && \
     apt-get install -q -y --no-install-recommends tzdata && \
@@ -25,28 +11,25 @@ RUN echo 'Etc/UTC' > /etc/timezone && \
 
 # install packages
 RUN apt-get update && apt-get install -q -y --no-install-recommends \
+    ca-certificates \
+    curl \
     dirmngr \
     gnupg2 \
     && rm -rf /var/lib/apt/lists/*
 
-# setup keys
-RUN set -eux; \
-       key='C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654'; \
-       export GNUPGHOME="$(mktemp -d)"; \
-       gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key"; \
-       mkdir -p /usr/share/keyrings; \
-       gpg --batch --export "$key" > /usr/share/keyrings/ros2-latest-archive-keyring.gpg; \
-       gpgconf --kill all; \
-       rm -rf "$GNUPGHOME"
 
-# setup sources.list
-RUN echo "deb [ signed-by=/usr/share/keyrings/ros2-latest-archive-keyring.gpg ] http://packages.ros.org/ros2/ubuntu noble main" > /etc/apt/sources.list.d/ros2-latest.list
+# Setup ROS Apt sources
+RUN curl -L -s -o /tmp/ros2-apt-source.deb https://github.com/ros-infrastructure/ros-apt-source/releases/download/1.1.0/ros2-apt-source_1.1.0.noble_all.deb \
+    && echo "35441f3092fd05773a3c397fab38661bec466584c7a1f1c05366579997cb5fe7 /tmp/ros2-apt-source.deb" | sha256sum --strict --check \
+    && apt-get update \
+    && apt-get install /tmp/ros2-apt-source.deb \
+    && rm -f /tmp/ros2-apt-source.deb \
+    && rm -rf /var/lib/apt/lists/*
 
 # setup environment
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 
-ENV ROSDISTRO_PKGS_SYNC_DATE=2024-11-21
 ENV ROS_DISTRO=jazzy
 
 # install ros2 packages
